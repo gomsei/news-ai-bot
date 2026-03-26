@@ -2,20 +2,29 @@ name: Daily Executive News Briefing
 
 on:
   schedule:
-    - cron: '0 22 * * *' # UTC 22:00 = KST 다음날 07:00
-  workflow_dispatch: # 필요시 수동 실행
+    - cron: '0 22 * * *' # UTC 22:00 = KST 07:00
+  workflow_dispatch: 
 
 jobs:
   run-news-bot:
     runs-on: ubuntu-latest
+    # Node.js 24 환경을 강제로 사용하도록 설정 (경고 제거)
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4 # v4는 최신 노드를 지원하므로 유지해도 무방하지만, 경고가 뜨면 v4의 최신 패치를 확인해야 함
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # v4에서 v5로 업데이트 (Node 20+ 지원)
         with:
           python-version: '3.10'
+
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml pandas google-generativeai
+        run: |
+          pip install -U google-generativeai requests beautifulsoup4 lxml pandas
+
       - name: Execute Script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
