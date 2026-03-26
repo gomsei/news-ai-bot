@@ -5,19 +5,19 @@ on:
     - cron: '0 22 * * *' # UTC 22:00 = KST 07:00
   workflow_dispatch: 
 
+# 글로벌 환경 변수 설정 (Node.js 24 강제 사용)
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   run-news-bot:
     runs-on: ubuntu-latest
-    # Node.js 24 환경을 강제로 사용하도록 설정 (경고 제거)
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # v4는 최신 노드를 지원하므로 유지해도 무방하지만, 경고가 뜨면 v4의 최신 패치를 확인해야 함
+        uses: actions/checkout@v4 # v4는 내부적으로 최신 노드를 지원함
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # v4에서 v5로 업데이트 (Node 20+ 지원)
+        uses: actions/setup-python@v5 # v4의 경고를 해결한 최신 v5 사용
         with:
           python-version: '3.10'
 
