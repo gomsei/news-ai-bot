@@ -14,7 +14,7 @@ CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
 
 ##################################################################
-def is_similar(a, b, threshold=0.6):
+def is_similar(a, b, threshold=0.5):
     """두 문자열(제목)의 유사도를 계산"""
     return SequenceMatcher(None, a, b).ratio() > threshold
 
