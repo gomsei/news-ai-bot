@@ -111,8 +111,8 @@ def send_news_gmail(news_list):
     # 1. 메일 설정
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    sender_email = os.getenv("NAVER_CLIENT_ID")
-    app_password = os.getenv("NAVER_CLIENT_ID")
+    sender_email = os.getenv("GMAIL_USER")
+    app_password = os.getenv("GMAIL_APP_PASSWORD")
     receiver_email = "gomsei@gmail.com,gomsei@yahoo.com"
 
     # 2. 메일 본문(HTML) 디자인
@@ -180,13 +180,4 @@ def send_news_gmail(news_list):
 # --- 3단계: 결과 실행 및 출력 ---
 if __name__ == "__main__":
     results = get_kb_news_automated()
-
-    print(f"\n[최종 리포트: {len(results)}건 수집됨]")
-    print("=" * 60)
-    for idx, news in enumerate(results, 1):
-        if idx > 10: break
-        importance = "★" * news['score'] if news['score'] > 0 else "☆"
-        print(f"{idx}. {importance} [{news['date']}] {news['title']}")
-        print(f"   요약: {news['desc']}")
-        print(f"   링크: {news['link']}")
-        print("-" * 60)
+    send_news_gmail(results[:10])
