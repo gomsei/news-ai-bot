@@ -1,34 +1,33 @@
-name: Daily Executive News Briefing
+name: Daily News Reporter
 
 on:
   schedule:
-    - cron: '0 22 * * *' # UTC 22:00 = KST 07:00
-  workflow_dispatch: 
-
-# 글로벌 환경 변수 설정 (Node.js 24 강제 사용)
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+    # 매일 아침 8시 실행 (UTC 기준이므로 한국 시간 08:00은 UTC 23:00입니다)
+    - cron: '0 22 * * *'
+  workflow_dispatch: # 수동으로 실행하고 싶을 때 사용
 
 jobs:
-  run-news-bot:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4 # v4는 내부적으로 최신 노드를 지원함
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5 # v4의 경고를 해결한 최신 v5 사용
-        with:
-          python-version: '3.10'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-      - name: Install dependencies
-        run: |
-          pip install -U google-generativeai requests beautifulsoup4 lxml pandas
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pandas openpyxl  # 필요한 라이브러리 추가
 
-      - name: Execute Script
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          RECIPIENTS: ${{ secrets.RECIPIENTS }}
-        run: python main.py
+    - name: Run news script
+      env:
+        NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+        NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      run: python main.py  # 본인의 파이썬 파일명으로 수정
