@@ -2,7 +2,7 @@ name: Daily News Reporter
 
 on:
   schedule:
-    - cron: '0 23 * * *' # 한국 시간 오전 8시
+    - cron: '0 22 * * *' # 한국 시간 오전 8시
   workflow_dispatch: 
 
 jobs:
