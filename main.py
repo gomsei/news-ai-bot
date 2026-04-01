@@ -114,7 +114,7 @@ def send_news_gmail(news_list):
     smtp_port = 587
     sender_email = os.getenv("GMAIL_USER")
     app_password = os.getenv("GMAIL_APP_PASSWORD")
-    receiver_email = "gomsei@gmail.com"
+    receiver_email = "gomsei@gmail.com,jungsun8610@gmail.com"
 
     # 2. 메일 본문(HTML) 디자인
     html_content = f"""
