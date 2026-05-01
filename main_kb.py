@@ -69,28 +69,13 @@ def get_kb_news_automated():
     # 검색 키워드 확장 리스트
     ##################################################################
     keywords = [ 
-        "AI 신용평가",
-        "금융A I",
-        "AI 리스크관리",
-        "AI 사기탐지",
-        "AI 금융규제",
-        "AI 공시",
-        "AI 회계감사",
-        "AI 내부감사",
-        "디지털감사",
-        "스마트감사",
-        "AI 감사도구",
-        "AI 이상탐지",
-        "AI 감사기준",
-        "감사자동화",
-        "금감원 AI",
-        "감사원 AI",
-        "AI 감사위험",
-        "AI 재무감사",
-        "금융 AI 규제"
+        "KB국민은행", "국민은행 노조", "국민은행 콜센터", "국민은행 상담사", 
+        "국민은행 고객센터", "국민은행 단체교섭", "국민은행 파업", 
+        "원청 고용", "금융노조", "전국콜센터", "KS신용정보", "인공지능 AI"
+        
     ]
     ##################################################################
-    exclude_words = []
+    exclude_words = ["농구", "주식", "종목", "급등", "테마주", "상한가", "부동산", "아파트"]
     
     all_news = {}
     now = datetime.now()
@@ -103,7 +88,7 @@ def get_kb_news_automated():
         time.sleep(0.1)
 
         encText = urllib.parse.quote(kw)
-        url = f"https://openapi.naver.com/v1/search/news.json?query={encText}&display=10&sort=sim"
+        url = f"https://openapi.naver.com/v1/search/news.json?query={encText}&display=100&sort=date"
 
         request = urllib.request.Request(url)
         request.add_header("X-Naver-Client-Id", CLIENT_ID)
@@ -128,13 +113,19 @@ def get_kb_news_automated():
                     if any(word in title for word in exclude_words):
                         continue  # 다음 뉴스로 넘어감
                         
+                    # 가중치 계산 (KB/국민은행, 노조/파업/교섭, 콜센터/상담사)
+                    ##################################################################
+                    is_kb = 2 if any(x in title for x in ['KB국민은행']) else 0
+                    is_cc = 1 if any(x in title for x in ['콜센터', '상담사', '고용승계', '아웃소싱', '하청']) else 0
+                    is_lu = 1 if any(x in title for x in ['노조', '노동조합', '파업', '교섭', '투쟁']) else 0
+                    
                     all_news[link] = {
                         'date': pub_date.strftime("%Y-%m-%d %H:%M"),
                         'title': title,
                         'desc': desc,
                         'link': link,
-                        'raw_date': pub_date,
-                        'keyword': kw
+                        'score': is_kb + is_cc + is_lu,
+                        'raw_date': pub_date
                     }
                 else:
                     break 
@@ -142,7 +133,7 @@ def get_kb_news_automated():
             print(f"검색 오류 ({kw}): {e}")
 
     # 리스트로 변환 및 기본 정렬 (점수 높은 순 -> 최신순)
-    initial_list = sorted(all_news.values(), key=lambda x: (x['raw_date']), reverse=True)
+    initial_list = sorted(all_news.values(), key=lambda x: (x['score'], x['raw_date']), reverse=True)
 
     # --- 2단계: 유사 기사 필터링 (더 좋은 기사 남기기) ---
     final_unique_news = []
@@ -152,7 +143,8 @@ def get_kb_news_automated():
             if is_similar(new_item['title'], existing['title'], threshold=0.6):
                 is_duplicate = True
                 # 점수가 더 높거나, 점수가 같은데 제목이 더 길면(정보량이 많으면) 교체
-                if (len(new_item['title']) > len(existing['title'])):
+                if (new_item['score'] > existing['score']) or \
+                   (new_item['score'] == existing['score'] and len(new_item['title']) > len(existing['title'])):
                     final_unique_news[i] = new_item
                 break
         
@@ -182,23 +174,26 @@ def send_news_gmail(news_list):
             .desc {{ font-size: 12px; color: #666666; text-decoration: none; }}
             .meta {{ color: #888; font-size: 12px; margin-top: 5px; }}
             .tag {{ background: #eee; padding: 2px 5px; border-radius: 3px; font-size: 11px; }}
+            .score {{ color: #d32f2f; font-weight: bold; }}
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h2>📅 AI/금융/감사 뉴스 리포트 ({datetime.now().strftime('%m/%d')})</h2>
+                <h2>📅 KB국민은행 뉴스 리포트 ({datetime.now().strftime('%m/%d')})</h2>
             </div>
     """
 
     for news in news_list:
+        stars = "★" * news['score']
         html_content += f"""
             <div class="news-item">
                 <a href="{news['link']}" class="title">{news['title']}</a><br/>
                 <div class="desc">{news['desc']}</div>
                 <div class="meta">
+                    <span class="score">{stars}</span> | 
                     <span>{news['date']}</span> | 
-                    <span class="tag">#{news['keyword']}</span>
+                    <span class="tag">#국민은행</span>
                 </div>
             </div>
         """
@@ -213,7 +208,7 @@ def send_news_gmail(news_list):
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = receiver_email
-    msg['Subject'] = f"[{datetime.now().strftime('%m/%d')}] AI/금융/감사 관련 주요 뉴스 브리핑"
+    msg['Subject'] = f"[{datetime.now().strftime('%m/%d')}] KB국민은행 관련 주요 뉴스 브리핑"
     msg.attach(MIMEText(html_content, 'html'))
 
     # 4. 메일 전송
