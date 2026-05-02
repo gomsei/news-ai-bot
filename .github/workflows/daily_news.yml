@@ -5,6 +5,9 @@ on:
     - cron: '10 22 * * *' # 한국 시간 오전 8시
   workflow_dispatch: 
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 추가 (방법2 선택시)
+
 jobs:
   build:
     runs-on: ubuntu-latest
