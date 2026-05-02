@@ -14,11 +14,9 @@ jobs:
 
     steps:
     - name: Checkout code
-      # v3 -> v4로 업데이트
       uses: actions/checkout@v4
 
     - name: Set up Python
-      # v4 -> v5로 업데이트
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
