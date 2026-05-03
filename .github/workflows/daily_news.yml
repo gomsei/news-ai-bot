@@ -1,9 +1,11 @@
 name: Daily News Reporter
 
 on:
-  schedule:
-    - cron: '10 22 * * *' # 한국 시간 오전 8시
+  # schedule:
+  #  - cron: '10 22 * * *' # 한국 시간 오전 8시
   workflow_dispatch: 
+  repository_dispatch:
+    types: [pipedream_trigger] # Pipedream에서 보낼 이벤트 이름
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 추가 (방법2 선택시)
