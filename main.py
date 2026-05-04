@@ -2,7 +2,7 @@ import urllib.request
 import json
 import os, sys
 import time
-from datetime import datetime, timedelta, date
+from datetime import datetime, timezone, timedelta, date
 from difflib import SequenceMatcher
 import smtplib
 from email.mime.multipart import MIMEMultipart
