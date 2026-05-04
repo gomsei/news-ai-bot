@@ -232,7 +232,8 @@ def send_news_gmail(news_list):
         
 # --- 3단계: 결과 실행 및 출력 ---
 if __name__ == "__main__":
-    day_check_result = get_last_working_day(kr_holidays, datetime.now(pytz.timezone("Asia/Seoul").date()) #테스트:date(2026,5,5)
+    #day_check_result = get_last_working_day(kr_holidays, datetime.now(ZoneInfo("Asia/Seoul")).date()) #테스트:date(2026,5,5)
+    day_check_result = get_last_working_day(kr_holidays, datetime.now(pytz.timezone("Asia/Seoul")).date()) #테스트:date(2026,5,5)
     if day_check_result["holiday_yn"]:
         print(day_check_result["reason"])
         sys.exit(0)
