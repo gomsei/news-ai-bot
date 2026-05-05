@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 #load_dotenv()
 
 import holidays
-kr_holidays = holidays.KR()
+kr_holidays = holidays.KR(language='ko')
 
 # 공휴일여부, 최근영업일 파악
 ##################################################################
